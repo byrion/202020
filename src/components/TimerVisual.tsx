@@ -35,10 +35,12 @@ const TimerVisual = (props: Props) => {
 
       ctx.beginPath();
       ctx.lineWidth = 5;
+      ctx.strokeStyle = "#cccccc";
       ctx.arc(250, 250, 100, 1.5 * Math.PI, arcAngle * Math.PI, true);
       ctx.font = "64px sans-serif";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
+      ctx.fillStyle = "#cccccc";
       ctx.fillText(props.value, 250, 252);
       ctx.stroke();
     }
