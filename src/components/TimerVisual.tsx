@@ -8,6 +8,7 @@ const ANGLE_RANGE = ARC_ANGLE_MAX - ARC_ANGLE_MIN;
 
 export interface Props {
   seconds: number;
+  completed(): void;
 }
 
 const TimerVisual = (props: Props) => {
@@ -25,7 +26,6 @@ const TimerVisual = (props: Props) => {
   }, [props.seconds]);
 
   useEffect(() => {
-    console.log(deadline);
     renderTimer();
   }, [deadline]);
 
@@ -48,23 +48,36 @@ const TimerVisual = (props: Props) => {
           ((now.valueOf() - deadline.valueOf()) / 1000) +
         4.7;
 
-      const secondsRemaining = (deadline.valueOf() - now.valueOf()) / 1000;
-      const counter = Math.round(
-        secondsRemaining > 60 ? secondsRemaining / 60 : secondsRemaining
+      const timeRemaining = (deadline.valueOf() - now.valueOf()) / 1000;
+
+      const counter = timeRemaining > 60 ? timeRemaining / 60 : timeRemaining;
+      const millisecondsRemaining = Math.round(
+        Number((counter % 1).toFixed(2)) * 60
       );
+      const counterMillis: string =
+        millisecondsRemaining < 10
+          ? `0${millisecondsRemaining}`
+          : `${millisecondsRemaining}`;
 
       ctx.beginPath();
       ctx.lineWidth = 5;
       ctx.strokeStyle = "#cccccc";
       ctx.arc(250, 250, 100, 1.5 * Math.PI, arcAngle, true);
       ctx.font = "64px sans-serif";
-      ctx.textAlign = "center";
+      ctx.textAlign = "right";
       ctx.textBaseline = "middle";
       ctx.fillStyle = "#cccccc";
-      ctx.fillText(counter, 250, 252);
+      ctx.fillText(Math.round(counter), 266, 252);
+      ctx.font = "30px sans-serif";
+      ctx.textAlign = "left";
+      ctx.fillText(counterMillis, 273, 262);
       ctx.stroke();
 
-      window.requestAnimationFrame(renderTimer);
+      if (timeRemaining > 0) {
+        window.requestAnimationFrame(renderTimer);
+      } else {
+        props.completed();
+      }
     }
   };
 

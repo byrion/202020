@@ -1,5 +1,6 @@
 import moment, { Moment } from "moment";
 import React, { useEffect, useState } from "react";
+import TIMER_TARGET from "../types/TimerValue";
 
 import TimerVisual from "./TimerVisual";
 
@@ -8,21 +9,18 @@ export interface Props {
 }
 
 const Clock = (props: Props) => {
-  const [timerValue, setTimerValue] = useState(props.startValue);
+  const [timerState, setTimerState] = useState(TIMER_TARGET.TWENTY_SECONDS);
 
-  useEffect(() => {
-    if (timerValue < 0) {
-      setTimerValue(props.startValue);
-    }
-  }, [timerValue]);
+  const onTimerCompleted = () => {
+    console.log("Timer Completed");
+    const state =
+      timerState === TIMER_TARGET.TWENTY_SECONDS
+        ? TIMER_TARGET.TWENTY_MINUTES
+        : TIMER_TARGET.TWENTY_SECONDS;
+    setTimerState(state);
+  };
 
-  useEffect(() => {
-    setInterval(() => {
-      setTimerValue((timerValue) => timerValue - 1);
-    }, 1000);
-  }, []);
-
-  return <TimerVisual seconds={1200} />;
+  return <TimerVisual seconds={timerState} completed={onTimerCompleted} />;
 };
 
 export default Clock;
