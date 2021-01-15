@@ -4,9 +4,7 @@ import TIMER_TARGET from "../types/TimerValue";
 
 import TimerVisual from "./TimerVisual";
 
-export interface Props {
-  startValue: number;
-}
+export interface Props {}
 
 const Clock = (props: Props) => {
   const [timerState, setTimerState] = useState(TIMER_TARGET.TWENTY_SECONDS);

@@ -1,10 +1,7 @@
-import classes from "*.module.css";
 import moment, { Moment } from "moment";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-const ARC_ANGLE_MAX = 1.5;
-const ARC_ANGLE_MIN = -0.5;
-const ANGLE_RANGE = ARC_ANGLE_MAX - ARC_ANGLE_MIN;
+const ARC_ANGLE_TWELVE_OCLOCK = 1.5;
 
 export interface Props {
   seconds: number;
@@ -13,9 +10,6 @@ export interface Props {
 
 const TimerVisual = (props: Props) => {
   const canvasRef = useRef(null);
-
-  // animate frame
-  // https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Basic_animations
 
   const futureDate = moment().add(props.seconds, "second");
   const [deadline, setDeadline]: any = useState(futureDate);
@@ -35,13 +29,8 @@ const TimerVisual = (props: Props) => {
       const now = moment();
       var ctx = canvas.getContext("2d");
 
-      // ctx.save();
-
-      // Use the identity matrix while clearing the canvas
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // ctx.restore();
 
       const arcAngle =
         ((2 * Math.PI) / props.seconds) *
@@ -51,27 +40,28 @@ const TimerVisual = (props: Props) => {
       const timeRemaining = (deadline.valueOf() - now.valueOf()) / 1000;
 
       const counter = timeRemaining > 60 ? timeRemaining / 60 : timeRemaining;
-      const millisecondsRemaining = Math.round(
-        Number((counter % 1).toFixed(2)) * 60
-      );
+      const millisecondsRemaining = Math.floor((counter % 1) * 60);
       const counterMillis: string =
         millisecondsRemaining < 10
           ? `0${millisecondsRemaining}`
           : `${millisecondsRemaining}`;
 
-      ctx.beginPath();
       ctx.lineWidth = 5;
       ctx.strokeStyle = "#cccccc";
-      ctx.arc(250, 250, 100, 1.5 * Math.PI, arcAngle, true);
+      ctx.beginPath();
+      ctx.arc(250, 250, 100, ARC_ANGLE_TWELVE_OCLOCK * Math.PI, arcAngle, true);
+      ctx.stroke();
+
+      ctx.fillStyle = "#cccccc";
+      ctx.textBaseline = "middle";
+
       ctx.font = "64px sans-serif";
       ctx.textAlign = "right";
-      ctx.textBaseline = "middle";
-      ctx.fillStyle = "#cccccc";
-      ctx.fillText(Math.round(counter), 266, 252);
+      ctx.fillText(Math.floor(counter), 266, 252);
+
       ctx.font = "30px sans-serif";
       ctx.textAlign = "left";
       ctx.fillText(counterMillis, 273, 262);
-      ctx.stroke();
 
       if (timeRemaining > 0) {
         window.requestAnimationFrame(renderTimer);
@@ -79,13 +69,6 @@ const TimerVisual = (props: Props) => {
         props.completed();
       }
     }
-  };
-
-  const calculateMillisecondsRemaining = (deadline: Moment) => {
-    const now = moment().valueOf();
-    const remaining = deadline.valueOf() - now;
-    // console.log(now, deadline.valueOf(), remaining);
-    return remaining;
   };
 
   return <canvas height="500" width="500" ref={canvasRef} />;
