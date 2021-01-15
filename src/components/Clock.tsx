@@ -1,3 +1,4 @@
+import moment, { Moment } from "moment";
 import React, { useEffect, useState } from "react";
 
 import TimerVisual from "./TimerVisual";
@@ -21,7 +22,7 @@ const Clock = (props: Props) => {
     }, 1000);
   }, []);
 
-  return <TimerVisual value={timerValue} total={props.startValue} />;
+  return <TimerVisual seconds={20} />;
 };
 
 export default Clock;
