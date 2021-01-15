@@ -22,7 +22,7 @@ const Clock = (props: Props) => {
     }, 1000);
   }, []);
 
-  return <TimerVisual seconds={20} />;
+  return <TimerVisual seconds={1200} />;
 };
 
 export default Clock;

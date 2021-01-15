@@ -46,10 +46,11 @@ const TimerVisual = (props: Props) => {
       const arcAngle =
         ((2 * Math.PI) / props.seconds) *
           ((now.valueOf() - deadline.valueOf()) / 1000) +
-        4.8;
+        4.7;
 
-      const secondsRemaining = Math.round(
-        (deadline.valueOf() - now.valueOf()) / 1000
+      const secondsRemaining = (deadline.valueOf() - now.valueOf()) / 1000;
+      const counter = Math.round(
+        secondsRemaining > 60 ? secondsRemaining / 60 : secondsRemaining
       );
 
       ctx.beginPath();
@@ -60,7 +61,7 @@ const TimerVisual = (props: Props) => {
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillStyle = "#cccccc";
-      ctx.fillText(secondsRemaining, 250, 252);
+      ctx.fillText(counter, 250, 252);
       ctx.stroke();
 
       window.requestAnimationFrame(renderTimer);
