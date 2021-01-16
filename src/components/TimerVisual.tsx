@@ -18,7 +18,9 @@ const TimerVisual = (props: Props) => {
   const [millisRemaining, setMillisRemaining]: any = useState(0);
 
   useEffect(() => {
-    renderTimer();
+    const now = moment();
+    const timeRemaining = (deadline.valueOf() - now.valueOf()) / 1000;
+    renderTimer(now, timeRemaining);
   }, []);
 
   useEffect(() => {
@@ -43,8 +45,16 @@ const TimerVisual = (props: Props) => {
 
     if (!props.paused && millisRemaining === 0) {
       const updateTimer = () => {
-        renderTimer();
-        timerId = window.requestAnimationFrame(updateTimer);
+        const now = moment();
+        const timeRemaining = (deadline.valueOf() - now.valueOf()) / 1000;
+
+        if (timeRemaining >= 0) {
+          renderTimer(now, timeRemaining);
+          timerId = window.requestAnimationFrame(updateTimer);
+        } else {
+          window.cancelAnimationFrame(timerId);
+          props.completed();
+        }
       };
 
       timerId = window.requestAnimationFrame(updateTimer);
@@ -53,10 +63,7 @@ const TimerVisual = (props: Props) => {
     }
   }, [props.paused, deadline]);
 
-  const renderTimer = () => {
-    const now = moment();
-
-    const timeRemaining = (deadline.valueOf() - now.valueOf()) / 1000;
+  const renderTimer = (now: Moment, timeRemaining: number) => {
     const counter = timeRemaining > 60 ? timeRemaining / 60 : timeRemaining;
     const millisecondsRemaining = Math.floor((counter % 1) * 60);
 
