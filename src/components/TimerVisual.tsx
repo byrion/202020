@@ -1,7 +1,5 @@
 import moment, { Moment } from "moment";
-import { useEffect, useRef, useState } from "react";
-import { start } from "repl";
-import TIMER_TARGET from "../types/TimerValue";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 const ARC_ANGLE_TWELVE_OCLOCK = 1.5;
 
@@ -17,48 +15,53 @@ const TimerVisual = (props: Props) => {
   const futureDate = moment().add(props.seconds, "second");
   const [deadline, setDeadline]: any = useState(futureDate);
 
-  const [paused, setPaused]: any = useState(props.paused);
+  const [millisRemaining, setMillisRemaining]: any = useState(0);
+
+  useEffect(() => {
+    renderTimer();
+  }, []);
 
   useEffect(() => {
     const futureDate: Moment = moment().add(props.seconds, "second");
     setDeadline(futureDate);
   }, [props.seconds]);
 
-  useEffect(() => {
-    updateTimer();
-  }, [deadline]);
-
-  useEffect(() => {
-    console.log("useEffect", props.paused);
-    setPaused(props.paused);
+  useLayoutEffect(() => {
+    if (props.paused) {
+      const now = moment();
+      const remainder = deadline.valueOf() - now.valueOf();
+      setMillisRemaining(remainder);
+    } else if (millisRemaining > 0) {
+      const newDeadline = moment().add(millisRemaining, "milliseconds");
+      setMillisRemaining(0);
+      setDeadline(newDeadline);
+    }
   }, [props.paused]);
 
-  const updateTimer = () => {
-    const now = moment();
+  useLayoutEffect(() => {
+    let timerId: number;
 
-    const arcAngle =
-      ((2 * Math.PI) / props.seconds) *
-        ((now.valueOf() - deadline.valueOf()) / 1000) +
-      4.7;
+    if (!props.paused && millisRemaining === 0) {
+      const updateTimer = () => {
+        renderTimer();
+        timerId = window.requestAnimationFrame(updateTimer);
+      };
+
+      timerId = window.requestAnimationFrame(updateTimer);
+
+      return () => window.cancelAnimationFrame(timerId);
+    }
+  }, [props.paused, deadline]);
+
+  const renderTimer = () => {
+    const now = moment();
 
     const timeRemaining = (deadline.valueOf() - now.valueOf()) / 1000;
     const counter = timeRemaining > 60 ? timeRemaining / 60 : timeRemaining;
-    const millisecondsRemaining = (counter % 1) * 60;
+    const millisecondsRemaining = Math.floor((counter % 1) * 60);
 
     const arcPosition = now.valueOf() - deadline.valueOf();
 
-    renderTimer(
-      arcPosition,
-      Math.floor(counter),
-      Math.floor(millisecondsRemaining)
-    );
-  };
-
-  const renderTimer = (
-    arcPosition: number,
-    bigCounter: number,
-    tinyCounter: number
-  ) => {
     const canvas: any = canvasRef.current;
     if (canvas !== null) {
       const now = moment();
@@ -83,25 +86,21 @@ const TimerVisual = (props: Props) => {
       ctx.font = "64px sans-serif";
       ctx.textAlign = "right";
 
-      if (props.paused && paused) {
-        ctx.fillText("I I", 266, 252);
+      // console.log(props.paused, paused);
+      if (props.paused) {
+        ctx.fillText("20", 266, 252);
       } else {
-        ctx.fillText(bigCounter, 266, 252);
+        ctx.fillText(Math.floor(counter), 266, 252);
       }
 
       const tinyCounterStr: string =
-        tinyCounter < 10 ? `0${tinyCounter}` : `${tinyCounter}`;
+        millisecondsRemaining < 10
+          ? `0${millisecondsRemaining}`
+          : `${millisecondsRemaining}`;
 
       ctx.font = "30px sans-serif";
       ctx.textAlign = "left";
       ctx.fillText(tinyCounterStr, 273, 262);
-
-      if (bigCounter > 0) {
-        window.requestAnimationFrame(updateTimer);
-      } else if (bigCounter <= 0) {
-        window.cancelAnimationFrame(canvas);
-        props.completed();
-      }
     }
   };
 
