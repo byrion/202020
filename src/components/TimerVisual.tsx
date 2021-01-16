@@ -20,6 +20,7 @@ const TimerVisual = (props: Props) => {
   useEffect(() => {
     const now = moment();
     renderTimer(now, 20);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -37,6 +38,7 @@ const TimerVisual = (props: Props) => {
       setMillisRemaining(0);
       setDeadline(newDeadline);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.paused]);
 
   useLayoutEffect(() => {
@@ -60,6 +62,7 @@ const TimerVisual = (props: Props) => {
 
       return () => window.cancelAnimationFrame(timerId);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.paused, deadline]);
 
   const renderTimer = (now: Moment, timeRemaining: number) => {
@@ -70,7 +73,6 @@ const TimerVisual = (props: Props) => {
 
     const canvas: any = canvasRef.current;
     if (canvas !== null) {
-      const now = moment();
       var ctx = canvas.getContext("2d");
 
       ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -99,16 +101,11 @@ const TimerVisual = (props: Props) => {
       ctx.font = "64px sans-serif";
       ctx.textAlign = "right";
 
-      // console.log(props.paused, paused);
-      // if (props.paused) {
-      //   ctx.fillText("20", canvas.width / 2 + 23, canvas.height / 2);
-      // } else {
       ctx.fillText(
         Math.floor(counter),
-        canvas.width / 2 + 20,
-        canvas.height / 2
+        canvas.width / 2 + 18,
+        canvas.height / 2 + 3
       );
-      // }
 
       const tinyCounterStr: string =
         millisecondsRemaining < 10
@@ -119,8 +116,8 @@ const TimerVisual = (props: Props) => {
       ctx.textAlign = "left";
       ctx.fillText(
         tinyCounterStr,
-        canvas.width / 2 + 30,
-        canvas.height / 2 + 10
+        canvas.width / 2 + 24,
+        canvas.height / 2 + 13
       );
     }
   };

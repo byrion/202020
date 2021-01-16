@@ -6,9 +6,10 @@ import TIMER_TARGET from "../types/TimerValue";
 
 import TimerVisual from "./TimerVisual";
 
-export interface Props {}
-
 const useStyles = makeStyles(() => ({
+  clockContainer: {
+    marginLeft: 35,
+  },
   playIconButton: {
     marginLeft: -50,
     marginTop: -84,
@@ -20,9 +21,15 @@ const useStyles = makeStyles(() => ({
     borderRadius: "50%",
     borderWidth: "0px",
   },
+  introText: {
+    fontSize: "1.2em",
+    fontWeight: "normal",
+    color: "#777777",
+    paddingTop: "2em",
+  },
 }));
 
-const Clock = (props: Props) => {
+const Clock = () => {
   const classes = useStyles();
 
   const [timerState, setTimerState] = useState(TIMER_TARGET.TWENTY_SECONDS);
@@ -61,22 +68,31 @@ const Clock = (props: Props) => {
 
   return (
     <>
-      <TimerVisual
-        seconds={timerState}
-        completed={onTimerCompleted}
-        paused={timerPaused}
-      />
-      <IconButton
-        onClick={pauseToggle}
-        component="span"
-        className={classes.playIconButton}
-      >
-        {timerPaused ? (
-          <PlayCircleFilledIcon className={classes.playIcon} />
-        ) : (
-          <PauseCircleFilledIcon className={classes.playIcon} />
-        )}
-      </IconButton>
+      <div className={classes.clockContainer}>
+        <TimerVisual
+          seconds={timerState}
+          completed={onTimerCompleted}
+          paused={timerPaused}
+        />
+        <IconButton
+          onClick={pauseToggle}
+          component="span"
+          className={classes.playIconButton}
+        >
+          {timerPaused ? (
+            <PlayCircleFilledIcon className={classes.playIcon} />
+          ) : (
+            <PauseCircleFilledIcon className={classes.playIcon} />
+          )}
+        </IconButton>
+      </div>
+      <h1 className={classes.introText}>
+        Every 20 minutes,
+        <br />
+        look at something 20 feet away,
+        <br />
+        for 20 seconds
+      </h1>
     </>
   );
 };
