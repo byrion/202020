@@ -1,13 +1,30 @@
-import { timeEnd } from "console";
-import moment, { Moment } from "moment";
-import React, { useEffect, useState } from "react";
+import { IconButton, makeStyles } from "@material-ui/core";
+import PlayCircleFilledIcon from "@material-ui/icons/PlayCircleFilled";
+import PauseCircleFilledIcon from "@material-ui/icons/PauseCircleFilled";
+import React, { useState } from "react";
 import TIMER_TARGET from "../types/TimerValue";
 
 import TimerVisual from "./TimerVisual";
 
 export interface Props {}
 
+const useStyles = makeStyles(() => ({
+  playIconButton: {
+    marginLeft: -50,
+    marginTop: -84,
+  },
+  playIcon: {
+    width: 65,
+    height: 65,
+    color: "#cccccc",
+    borderRadius: "50%",
+    borderWidth: "0px",
+  },
+}));
+
 const Clock = (props: Props) => {
+  const classes = useStyles();
+
   const [timerState, setTimerState] = useState(TIMER_TARGET.TWENTY_SECONDS);
   const [timerPaused, setTimerPaused] = useState(true);
 
@@ -49,7 +66,17 @@ const Clock = (props: Props) => {
         completed={onTimerCompleted}
         paused={timerPaused}
       />
-      <button onClick={pauseToggle}>Pause/Unpause</button>
+      <IconButton
+        onClick={pauseToggle}
+        component="span"
+        className={classes.playIconButton}
+      >
+        {timerPaused ? (
+          <PlayCircleFilledIcon className={classes.playIcon} />
+        ) : (
+          <PauseCircleFilledIcon className={classes.playIcon} />
+        )}
+      </IconButton>
     </>
   );
 };

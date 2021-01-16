@@ -19,8 +19,7 @@ const TimerVisual = (props: Props) => {
 
   useEffect(() => {
     const now = moment();
-    const timeRemaining = (deadline.valueOf() - now.valueOf()) / 1000;
-    renderTimer(now, timeRemaining);
+    renderTimer(now, 20);
   }, []);
 
   useEffect(() => {
@@ -84,7 +83,14 @@ const TimerVisual = (props: Props) => {
       const arcAngle =
         ((2 * Math.PI) / props.seconds) * (arcPosition / 1000) + 4.7;
 
-      ctx.arc(250, 250, 100, ARC_ANGLE_TWELVE_OCLOCK * Math.PI, arcAngle, true);
+      ctx.arc(
+        canvas.width / 2,
+        canvas.height / 2,
+        100,
+        ARC_ANGLE_TWELVE_OCLOCK * Math.PI,
+        arcAngle,
+        true
+      );
       ctx.stroke();
 
       ctx.fillStyle = "#cccccc";
@@ -94,11 +100,15 @@ const TimerVisual = (props: Props) => {
       ctx.textAlign = "right";
 
       // console.log(props.paused, paused);
-      if (props.paused) {
-        ctx.fillText("20", 266, 252);
-      } else {
-        ctx.fillText(Math.floor(counter), 266, 252);
-      }
+      // if (props.paused) {
+      //   ctx.fillText("20", canvas.width / 2 + 23, canvas.height / 2);
+      // } else {
+      ctx.fillText(
+        Math.floor(counter),
+        canvas.width / 2 + 20,
+        canvas.height / 2
+      );
+      // }
 
       const tinyCounterStr: string =
         millisecondsRemaining < 10
@@ -107,11 +117,15 @@ const TimerVisual = (props: Props) => {
 
       ctx.font = "30px sans-serif";
       ctx.textAlign = "left";
-      ctx.fillText(tinyCounterStr, 273, 262);
+      ctx.fillText(
+        tinyCounterStr,
+        canvas.width / 2 + 30,
+        canvas.height / 2 + 10
+      );
     }
   };
 
-  return <canvas height="500" width="500" ref={canvasRef} />;
+  return <canvas height="250" width="250" ref={canvasRef} />;
 };
 
 export default TimerVisual;
