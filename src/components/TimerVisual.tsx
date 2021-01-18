@@ -4,72 +4,73 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 const ARC_ANGLE_TWELVE_OCLOCK = 1.5;
 
 export interface Props {
-  seconds: number;
-  completed(): void;
+  targetSeconds: number;
   paused: boolean;
+  timerCompleted(): void;
 }
 
 const TimerVisual = (props: Props) => {
   const canvasRef = useRef(null);
 
-  const futureDate = moment().add(props.seconds, "second");
-  const [deadline, setDeadline]: any = useState(futureDate);
+  const futureDate = moment().add(props.targetSeconds, "second");
+  const [targetTimestamp, setTargetTimestamp]: any = useState(futureDate);
 
   const [millisRemaining, setMillisRemaining]: any = useState(0);
 
   useEffect(() => {
     const now = moment();
-    renderTimer(now, 20);
+    renderTimer(now, props.targetSeconds);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    const futureDate: Moment = moment().add(props.seconds, "second");
-    setDeadline(futureDate);
-  }, [props.seconds]);
+    const futureDate: Moment = moment().add(props.targetSeconds, "second");
+    setTargetTimestamp(futureDate);
+  }, [props.targetSeconds]);
 
   useLayoutEffect(() => {
     if (props.paused) {
       const now = moment();
-      const remainder = deadline.valueOf() - now.valueOf();
+      const remainder = targetTimestamp.valueOf() - now.valueOf();
       setMillisRemaining(remainder);
     } else if (millisRemaining > 0) {
       const newDeadline = moment().add(millisRemaining, "milliseconds");
       setMillisRemaining(0);
-      setDeadline(newDeadline);
+      setTargetTimestamp(newDeadline);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.paused]);
 
   useLayoutEffect(() => {
-    let timerId: number;
+    let animationRequest: number;
 
     if (!props.paused && millisRemaining === 0) {
       const updateTimer = () => {
         const now = moment();
-        const timeRemaining = (deadline.valueOf() - now.valueOf()) / 1000;
+        const timeRemaining =
+          (targetTimestamp.valueOf() - now.valueOf()) / 1000;
 
         if (timeRemaining >= 0) {
           renderTimer(now, timeRemaining);
-          timerId = window.requestAnimationFrame(updateTimer);
+          animationRequest = window.requestAnimationFrame(updateTimer);
         } else {
-          window.cancelAnimationFrame(timerId);
-          props.completed();
+          window.cancelAnimationFrame(animationRequest);
+          props.timerCompleted();
         }
       };
 
-      timerId = window.requestAnimationFrame(updateTimer);
+      animationRequest = window.requestAnimationFrame(updateTimer);
 
-      return () => window.cancelAnimationFrame(timerId);
+      return () => window.cancelAnimationFrame(animationRequest);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.paused, deadline]);
+  }, [props.paused, targetTimestamp]);
 
   const renderTimer = (now: Moment, timeRemaining: number) => {
     const counter = timeRemaining > 60 ? timeRemaining / 60 : timeRemaining;
-    const millisecondsRemaining = Math.floor((counter % 1) * 60);
+    const tinyCounter = Math.floor((counter % 1) * 60);
 
-    const arcPosition = now.valueOf() - deadline.valueOf();
+    const arcPosition = now.valueOf() - targetTimestamp.valueOf();
 
     const canvas: any = canvasRef.current;
     if (canvas !== null) {
@@ -83,7 +84,7 @@ const TimerVisual = (props: Props) => {
       ctx.beginPath();
 
       const arcAngle =
-        ((2 * Math.PI) / props.seconds) * (arcPosition / 1000) + 4.7;
+        ((2 * Math.PI) / props.targetSeconds) * (arcPosition / 1000) + 4.7;
 
       ctx.arc(
         canvas.width / 2,
@@ -108,9 +109,7 @@ const TimerVisual = (props: Props) => {
       );
 
       const tinyCounterStr: string =
-        millisecondsRemaining < 10
-          ? `0${millisecondsRemaining}`
-          : `${millisecondsRemaining}`;
+        tinyCounter < 10 ? `0${tinyCounter}` : `${tinyCounter}`;
 
       ctx.font = "30px sans-serif";
       ctx.textAlign = "left";
